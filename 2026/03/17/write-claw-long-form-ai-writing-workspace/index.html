@@ -1,0 +1,265 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace | re的编程之旅</title><meta name="author" content="X1a0Ch3n"><meta name="copyright" content="X1a0Ch3n"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Write-Claw 面向长篇 AI 写作场景，不再把写作理解为一次性 prompt 调用，而是组织成一个持续运行、可见、可控、可接管的创作 runtime。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace">
+<meta property="og:url" content="http://example.com/2026/03/17/write-claw-long-form-ai-writing-workspace/index.html">
+<meta property="og:site_name" content="re的编程之旅">
+<meta property="og:description" content="Write-Claw 面向长篇 AI 写作场景，不再把写作理解为一次性 prompt 调用，而是组织成一个持续运行、可见、可控、可接管的创作 runtime。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/Le-Prince-Grenouille.png">
+<meta property="article:published_time" content="2026-03-17T13:39:55.000Z">
+<meta property="article:modified_time" content="2026-03-20T13:18:05.393Z">
+<meta property="article:author" content="X1a0Ch3n">
+<meta property="article:tag" content="Write-Claw">
+<meta property="article:tag" content="长篇创作">
+<meta property="article:tag" content="Claw">
+<meta property="article:tag" content="Runtime Workspace">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/Le-Prince-Grenouille.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace",
+  "url": "http://example.com/2026/03/17/write-claw-long-form-ai-writing-workspace/",
+  "image": "http://example.com/img/Le-Prince-Grenouille.png",
+  "datePublished": "2026-03-17T13:39:55.000Z",
+  "dateModified": "2026-03-20T13:18:05.393Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "X1a0Ch3n",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/web-favicon.ico"><link rel="canonical" href="http://example.com/2026/03/17/write-claw-long-form-ai-writing-workspace/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: {"appId":"4NCUEL5UYM","apiKey":"cc65408e671df9d6ae21a14c26c98d0e","indexName":"hexo_blog","hitsPerPage":6,"languages":{"input_placeholder":"搜索文章...","hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，耗时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/Le-Prince-Grenouille.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><span> 站点</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" target="_blank" rel="noopener" href="https://www.yuque.com/leprincegrenouille"><i class="fa-fw fa fa-paper-plane"></i><span> 我的语雀</span></a></li><li><a class="site-page child" target="_blank" rel="noopener" href="https://bimg.cc"><i class="fa-fw iconfont icon-Bing"></i><span> 必应壁纸</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/share/"><i class="fa-fw fa fa-share-alt-square"></i><span> 分享</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 图库</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://www.travellings.cn/go.html"><i class="fa-fw fa fa-train"></i><span> 开往</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://foreverblog.cn/go.html"><i class="fa-fw fa fa-circle"></i><span> 虫洞</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">re的编程之旅</span></a><a class="nav-page-title" href="/"><span class="site-name">Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><span> 站点</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" target="_blank" rel="noopener" href="https://www.yuque.com/leprincegrenouille"><i class="fa-fw fa fa-paper-plane"></i><span> 我的语雀</span></a></li><li><a class="site-page child" target="_blank" rel="noopener" href="https://bimg.cc"><i class="fa-fw iconfont icon-Bing"></i><span> 必应壁纸</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/share/"><i class="fa-fw fa fa-share-alt-square"></i><span> 分享</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 图库</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://www.travellings.cn/go.html"><i class="fa-fw fa fa-train"></i><span> 开往</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://foreverblog.cn/go.html"><i class="fa-fw fa fa-circle"></i><span> 虫洞</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-17T13:39:55.000Z" title="发表于 2026-03-17 21:39:55">2026-03-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-20T13:18:05.393Z" title="更新于 2026-03-20 21:18:05">2026-03-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI-%E5%86%99%E4%BD%9C/">AI 写作</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI-%E5%86%99%E4%BD%9C/%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/">开源项目</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><code>Write-Claw</code> 试图把长篇 AI 写作从“单次生成”推进到“持续运行的创作空间”，让创意、规划、记忆、checkpoint 和修订都进入同一个可控 runtime。</p>
+<span id="more"></span>
+
+<p>原文链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/xyc_yyds/article/details/159174017">https://blog.csdn.net/xyc_yyds/article/details/159174017</a></p>
+<p>GitHub：<a target="_blank" rel="noopener" href="https://github.com/HITSZ-DS/Write-Claw.git">https://github.com/HITSZ-DS/Write-Claw.git</a></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/posts/write-claw-long-form-ai-writing-workspace/cover.png" alt="Write-Claw 封面"></p>
+<h2 id="一、项目定位"><a href="#一、项目定位" class="headerlink" title="一、项目定位"></a>一、项目定位</h2><p><code>Write-Claw</code> 不是普通的 AI 写作网页，也不是把大模型封装成聊天窗口的小说生成器。</p>
+<p>如果只用一句话定义它，我会这样说：</p>
+<p><code>Write-Claw</code> 是一个面向长篇 AI 写作的 Claw-native runtime workspace，它将创意、规划、执行、记忆、checkpoint、修订与可观测轨迹统一组织进一个可持续运行、可被宿主调度、可被作者接管的写作运行时。</p>
+<p>这里最重要的词不是 <code>writing workspace</code>，而是 <code>Claw-native</code>。<br>它的核心价值不只是“界面更完整”，而是整体组织方式本身就是典型的 Claw 模式。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/posts/write-claw-long-form-ai-writing-workspace/work-mode.png" alt="Write-Claw Work Mode"></p>
+<h2 id="二、什么叫-Write-Claw-的-Claw-模式"><a href="#二、什么叫-Write-Claw-的-Claw-模式" class="headerlink" title="二、什么叫 Write-Claw 的 Claw 模式"></a>二、什么叫 Write-Claw 的 Claw 模式</h2><p>这里说的 <code>Claw</code>，不是简单命名风格，也不是把 agent 换个说法。</p>
+<p><code>Write-Claw</code> 之所以强调自己是 <code>Claw-native</code>，是因为它符合一种典型的 <code>Claw-style runtime</code> 设计逻辑：</p>
+<ul>
+<li>它不是单轮 prompt 调用，而是持续运行的 agentic loop。</li>
+<li>它不是把所有能力折叠进聊天回复，而是把能力显式拆成工作区动作、运行时状态和可调用单元。</li>
+<li>它不是一次性生成后结束，而是支持规划、暂停、继续、修订、同步和 checkpoint。</li>
+<li>它不是黑盒返回结果，而是把轨迹、状态、能力栈、记忆面板、会话信息展示给用户。</li>
+<li>它不是“用户输入一句，系统吐一段”，而是“用户与系统共同维护一个持续运行的写作空间”。</li>
+</ul>
+<p>所以它体现的不是普通“AI 写作工具模式”，而是：</p>
+<p>作者进入的是一个写作 runtime，而不是一个文本生成输入框。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/posts/write-claw-long-form-ai-writing-workspace/runtime-model.png" alt="Write-Claw Runtime Model"></p>
+<h2 id="三、为什么它必须被描述成-Claw，而不是普通写作工具"><a href="#三、为什么它必须被描述成-Claw，而不是普通写作工具" class="headerlink" title="三、为什么它必须被描述成 Claw，而不是普通写作工具"></a>三、为什么它必须被描述成 Claw，而不是普通写作工具</h2><p>如果是普通写作工具，它的逻辑通常是：</p>
+<ul>
+<li>输入故事设定</li>
+<li>点击生成</li>
+<li>得到文本结果</li>
+</ul>
+<p>而 <code>Write-Claw</code> 的逻辑完全不同：</p>
+<ul>
+<li>用户先进入一个长期运行的创作工作台。</li>
+<li>系统在这个工作台中持续进行创意收敛、章节推进、状态维护和记忆累积。</li>
+<li>用户不是等待系统“吐结果”，而是在运行过程中不断观察、打断、修正、确认与接管。</li>
+<li>故事不是单次产物，而是一个不断被推进、被修订、被校准的长期项目。</li>
+</ul>
+<p>这正是 <code>Claw</code> 模式和普通生成工具的本质区别：<br>Claw 关注的不是一次调用，而是持续运行中的任务状态、动作轨迹与人机协作。</p>
+<h2 id="四、Write-Claw-的核心理念"><a href="#四、Write-Claw-的核心理念" class="headerlink" title="四、Write-Claw 的核心理念"></a>四、Write-Claw 的核心理念</h2><p><code>Write-Claw</code> 的核心理念可以概括成一句话：</p>
+<p>AI 写作不应只展示结果，更应该展示过程。</p>
+<p>它关心的问题包括：</p>
+<ul>
+<li>系统当前在做什么</li>
+<li>它为什么这样做</li>
+<li>它下一步准备做什么</li>
+<li>当前章节处于什么状态</li>
+<li>角色和世界设定是否被更新</li>
+<li>记忆是否发生漂移</li>
+<li>作者能否在过程中接管与修改</li>
+</ul>
+<p>换句话说，<code>Write-Claw</code> 想把 AI 写作从“文本生成结果”升级成“可见的创作运行过程”。</p>
+<h2 id="五、一句话心智模型"><a href="#五、一句话心智模型" class="headerlink" title="五、一句话心智模型"></a>五、一句话心智模型</h2><p>如果要对外介绍它，我建议这样说：</p>
+<p><code>Write-Claw</code> 不是 <code>prompt in, text out</code> 的写作器，而是一个 Claw-native 的长篇写作运行时。</p>
+<p>这句话里包含三个关键信息：</p>
+<ul>
+<li>它不是一次性生成器</li>
+<li>它围绕长篇写作设计</li>
+<li>它以 Claw 方式组织整个系统</li>
+</ul>
+<h2 id="六、系统形态：不是页面，而是运行时工作台"><a href="#六、系统形态：不是页面，而是运行时工作台" class="headerlink" title="六、系统形态：不是页面，而是运行时工作台"></a>六、系统形态：不是页面，而是运行时工作台</h2><p><code>Write-Claw</code> 最重要的设计，不是“页面做得多”，而是它把多个原本割裂的创作环节统一成了一个运行时工作台。</p>
+<p>在这个工作台里，作者面对的不是一个聊天框，而是一个完整的创作空间，其中包括：</p>
+<ul>
+<li>Runtime Loop</li>
+<li>Writing Console</li>
+<li>Memory Surface</li>
+<li>Workspace Tools</li>
+<li>Checkpoint Flow</li>
+<li>Session Center</li>
+<li>Status and Trace</li>
+<li>Capability Control</li>
+</ul>
+<p>这意味着 <code>Write-Claw</code> 实际上在做两件事：</p>
+<ol>
+<li>把长篇 AI 创作过程结构化。</li>
+<li>把这种结构化过程前台化。</li>
+</ol>
+<p>前者让系统更稳定，后者让用户更可控。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/posts/write-claw-long-form-ai-writing-workspace/summary.png" alt="Write-Claw Summary"></p>
+<h2 id="七、总结"><a href="#七、总结" class="headerlink" title="七、总结"></a>七、总结</h2><p><code>Write-Claw</code> 的核心价值不在于“它能生成小说”，而在于它把长篇 AI 写作真正做成了一个 <code>Claw-native runtime workspace</code>。</p>
+<p>在这个系统里：</p>
+<ul>
+<li>创意不再是一次性输入</li>
+<li>章节不再只是静态结果</li>
+<li>记忆不再只是模型内部缓存</li>
+<li>用户也不再是站在结果外面等待输出的旁观者</li>
+</ul>
+<p>相反，创作被组织成一个持续运行的 agentic loop：可规划、可追踪、可检查、可中断、可修订、可接管。</p>
+<p>也正因为如此，<code>Write-Claw</code> 不是一个普通写作产品，而是一种更接近未来创作基础设施的写作运行时形态。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">X1a0Ch3n</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2026/03/17/write-claw-long-form-ai-writing-workspace/">http://example.com/2026/03/17/write-claw-long-form-ai-writing-workspace/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">re的编程之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Write-Claw/">Write-Claw</a><a class="post-meta__tags" href="/tags/%E9%95%BF%E7%AF%87%E5%88%9B%E4%BD%9C/">长篇创作</a><a class="post-meta__tags" href="/tags/Claw/">Claw</a><a class="post-meta__tags" href="/tags/Runtime-Workspace/">Runtime Workspace</a></div><div class="post-share"><div class="social-share" data-image="/img/Le-Prince-Grenouille.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/17/colong-idea-studio-open-source-project/" title="CoLong Idea Studio开源项目详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">CoLong Idea Studio开源项目详解</div></div><div class="info-2"><div class="info-item-1">这篇文章围绕 CoLong Idea Studio 展开，介绍我在长篇 AI 创作方向上的整体探索，以及动态记忆优先、协同创意完善和章节生成闭环这些核心设计。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159169356 GitHub：https://github.com/HITSZ-DS/CoLong-Idea-Studio.git线上平台：https://colong-idea-studio.cloud  一、为什么要做这个项目如果只把 AI 写作理解成“输入一句 prompt，输出一段文本”，那它最多只是即时生成器，很难真正支持长篇创作、持续创作、多人协作和高一致性创作。 我做 CoLong Idea Studio 和 Write-Claw，本质上都在回答同一个问题： AI 怎样从一次性文本生成工具，演进为一个能够持续思考、持续记忆、持续规划、持续观察、持续协作的长篇创作系统。 这两个项目的侧重点并不相同：  CoLong Idea Studio...</div></div></div></a><a class="pagination-related" href="/2026/03/18/open-claw-mcp-security-project/" title="面对open claw的安全问题：我开源一个 MCP 安全检测项目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">面对open claw的安全问题：我开源一个 MCP 安全检测项目</div></div><div class="info-2"><div class="info-item-1">这篇文章记录了我为什么开始做 MCP Aegis，以及我对 MCP Server 风险扫描、策略决策、沙箱执行和审计追踪这条安全链路的理解。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159215539 GitHub：https://github.com/xiao-zi-chen/mcp-aegis.git  一、为什么开始做这个项目最近一直在看 MCP 生态，也在认真想一个问题： 如果 MCP Server 越来越多，大家开始频繁安装、调用、组合第三方工具，那它的安全边界到底在哪里？ 现在很多讨论停留在“这个生态很有前景”，但真正落到工程层面，会立刻遇到几类现实问题：  MCP Server 本质上就是可执行能力的入口。 它可能访问本地文件、环境变量、网络和外部 API。 一旦缺少验证、权限控制和审计能力，风险不会停留在理论层面。  所以我开始做一个开源项目：MCP Aegis。 它的目标不是做只有 PPT 的“安全平台”，而是把 MCP...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/03/17/colong-idea-studio-open-source-project/" title="CoLong Idea Studio开源项目详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-17</div><div class="info-item-2">CoLong Idea Studio开源项目详解</div></div><div class="info-2"><div class="info-item-1">这篇文章围绕 CoLong Idea Studio 展开，介绍我在长篇 AI 创作方向上的整体探索，以及动态记忆优先、协同创意完善和章节生成闭环这些核心设计。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159169356 GitHub：https://github.com/HITSZ-DS/CoLong-Idea-Studio.git线上平台：https://colong-idea-studio.cloud  一、为什么要做这个项目如果只把 AI 写作理解成“输入一句 prompt，输出一段文本”，那它最多只是即时生成器，很难真正支持长篇创作、持续创作、多人协作和高一致性创作。 我做 CoLong Idea Studio 和 Write-Claw，本质上都在回答同一个问题： AI 怎样从一次性文本生成工具，演进为一个能够持续思考、持续记忆、持续规划、持续观察、持续协作的长篇创作系统。 这两个项目的侧重点并不相同：  CoLong Idea Studio...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/Le-Prince-Grenouille.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">X1a0Ch3n</div><div class="author-info-description">RRRRRE</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">8</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xiao-zi-chen"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/xiao-zi-chen" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:yuchengxiao264@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A1%B9%E7%9B%AE%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.</span> <span class="toc-text">一、项目定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%BB%80%E4%B9%88%E5%8F%AB-Write-Claw-%E7%9A%84-Claw-%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">二、什么叫 Write-Claw 的 Claw 模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AE%83%E5%BF%85%E9%A1%BB%E8%A2%AB%E6%8F%8F%E8%BF%B0%E6%88%90-Claw%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E6%99%AE%E9%80%9A%E5%86%99%E4%BD%9C%E5%B7%A5%E5%85%B7"><span class="toc-number">3.</span> <span class="toc-text">三、为什么它必须被描述成 Claw，而不是普通写作工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81Write-Claw-%E7%9A%84%E6%A0%B8%E5%BF%83%E7%90%86%E5%BF%B5"><span class="toc-number">4.</span> <span class="toc-text">四、Write-Claw 的核心理念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%BF%83%E6%99%BA%E6%A8%A1%E5%9E%8B"><span class="toc-number">5.</span> <span class="toc-text">五、一句话心智模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%B3%BB%E7%BB%9F%E5%BD%A2%E6%80%81%EF%BC%9A%E4%B8%8D%E6%98%AF%E9%A1%B5%E9%9D%A2%EF%BC%8C%E8%80%8C%E6%98%AF%E8%BF%90%E8%A1%8C%E6%97%B6%E5%B7%A5%E4%BD%9C%E5%8F%B0"><span class="toc-number">6.</span> <span class="toc-text">六、系统形态：不是页面，而是运行时工作台</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">七、总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/python-network-threat-protection-analysis-system/" title="基于 Python 的网络威胁防御分析系统设计与实现">基于 Python 的网络威胁防御分析系统设计与实现</a><time datetime="2026-03-19T08:15:05.000Z" title="发表于 2026-03-19 16:15:05">2026-03-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/18/open-claw-mcp-security-project/" title="面对open claw的安全问题：我开源一个 MCP 安全检测项目">面对open claw的安全问题：我开源一个 MCP 安全检测项目</a><time datetime="2026-03-18T15:31:36.000Z" title="发表于 2026-03-18 23:31:36">2026-03-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/17/write-claw-long-form-ai-writing-workspace/" title="Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace">Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace</a><time datetime="2026-03-17T13:39:55.000Z" title="发表于 2026-03-17 21:39:55">2026-03-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/17/colong-idea-studio-open-source-project/" title="CoLong Idea Studio开源项目详解">CoLong Idea Studio开源项目详解</a><time datetime="2026-03-17T09:55:24.000Z" title="发表于 2026-03-17 17:55:24">2026-03-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2025/3/25 - 2026 By X1a0Ch3n</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div><div class="footer_custom_text">RE</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="algolia-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="search-wrap"><div id="algolia-search-input"></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-info"><div class="algolia-stats"></div><div class="algolia-poweredBy"></div></div></div></div></div><div id="search-mask"></div><script src="https://cdn.jsdelivr.net/npm/algoliasearch/dist/lite/builds/browser.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instantsearch.js/dist/instantsearch.production.min.js"></script><script src="/js/search/algolia.js"></script></div></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
