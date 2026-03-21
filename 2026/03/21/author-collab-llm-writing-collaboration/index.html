@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案 | re的编程之旅</title><meta name="author" content="X1a0Ch3n,915119162@qq.com"><meta name="copyright" content="X1a0Ch3n"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="围绕写作场景中的人机协同问题，讨论一种面向作者交互的小模型训练框架，重点覆盖主动澄清、约束整合、阶段切换与多轮协作优化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案">
+<meta property="og:url" content="https://xiao-zi-chen.github.io/2026/03/21/author-collab-llm-writing-collaboration/index.html">
+<meta property="og:site_name" content="re的编程之旅">
+<meta property="og:description" content="围绕写作场景中的人机协同问题，讨论一种面向作者交互的小模型训练框架，重点覆盖主动澄清、约束整合、阶段切换与多轮协作优化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xiao-zi-chen.github.io/img/Le-Prince-Grenouille.png">
+<meta property="article:published_time" content="2026-03-21T14:29:27.000Z">
+<meta property="article:modified_time" content="2026-03-21T14:51:28.290Z">
+<meta property="article:author" content="X1a0Ch3n">
+<meta property="article:tag" content="Author-Collab LLM">
+<meta property="article:tag" content="AI 写作">
+<meta property="article:tag" content="人机协同">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Multi-Agent">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://xiao-zi-chen.github.io/img/Le-Prince-Grenouille.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案",
+  "url": "https://xiao-zi-chen.github.io/2026/03/21/author-collab-llm-writing-collaboration/",
+  "image": "https://xiao-zi-chen.github.io/img/Le-Prince-Grenouille.png",
+  "datePublished": "2026-03-21T14:29:27.000Z",
+  "dateModified": "2026-03-21T14:51:28.290Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "X1a0Ch3n",
+      "url": "https://xiao-zi-chen.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/web-favicon.ico"><link rel="canonical" href="https://xiao-zi-chen.github.io/2026/03/21/author-collab-llm-writing-collaboration/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: {"appId":"4NCUEL5UYM","apiKey":"cc65408e671df9d6ae21a14c26c98d0e","indexName":"hexo_blog","hitsPerPage":6,"languages":{"input_placeholder":"搜索文章...","hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，耗时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/Le-Prince-Grenouille.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><span> 站点</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" target="_blank" rel="noopener" href="https://www.yuque.com/leprincegrenouille"><i class="fa-fw fa fa-paper-plane"></i><span> 我的语雀</span></a></li><li><a class="site-page child" target="_blank" rel="noopener" href="https://bimg.cc"><i class="fa-fw iconfont icon-Bing"></i><span> 必应壁纸</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/share/"><i class="fa-fw fa fa-share-alt-square"></i><span> 分享</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 图库</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://www.travellings.cn/go.html"><i class="fa-fw fa fa-train"></i><span> 开往</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://foreverblog.cn/go.html"><i class="fa-fw fa fa-circle"></i><span> 虫洞</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">re的编程之旅</span></a><a class="nav-page-title" href="/"><span class="site-name">Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><span class="site-page group"><span> 站点</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" target="_blank" rel="noopener" href="https://www.yuque.com/leprincegrenouille"><i class="fa-fw fa fa-paper-plane"></i><span> 我的语雀</span></a></li><li><a class="site-page child" target="_blank" rel="noopener" href="https://bimg.cc"><i class="fa-fw iconfont icon-Bing"></i><span> 必应壁纸</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 博文</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><span class="site-page group"><span> 生活</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/share/"><i class="fa-fw fa fa-share-alt-square"></i><span> 分享</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/gallery/"><i class="fa-fw fa fa-images"></i><span> 图库</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://www.travellings.cn/go.html"><i class="fa-fw fa fa-train"></i><span> 开往</span></a></div><div class="menus_item"><a class="site-page" target="_blank" rel="noopener" href="https://foreverblog.cn/go.html"><i class="fa-fw fa fa-circle"></i><span> 虫洞</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-21T14:29:27.000Z" title="发表于 2026-03-21 22:29:27">2026-03-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-21T14:51:28.290Z" title="更新于 2026-03-21 22:51:28">2026-03-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI-%E5%86%99%E4%BD%9C/">AI 写作</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/AI-%E5%86%99%E4%BD%9C/%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/">模型训练</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>这篇文章讨论的是一个更偏训练框架和协作策略层的问题：如果写作助手真正服务的是“作者与模型共同推进作品”的过程，那么模型的目标就不该只是生成更像样的文本，而应该是更好地参与协作。</p>
+<p>围绕这个问题，<code>Author-Collab LLM</code> 提出了一条更适合小模型的路线，即把模型训练成一个会主动追问、维护约束、切换阶段并协同修订的写作控制器，而不是单纯的长文本生成器。</p>
+<span id="more"></span>
+
+<p>原文链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/xyc_yyds/article/details/159323691">https://blog.csdn.net/xyc_yyds/article/details/159323691</a><br>GitHub：<a target="_blank" rel="noopener" href="https://github.com/HITSZ-DS/CoLong-Idea-Studio.git">https://github.com/HITSZ-DS/CoLong-Idea-Studio.git</a><br>转载说明：本文转载自 CSDN 博主 <code>xyc_yyds</code> 的原创文章，遵循 <code>CC 4.0 BY-SA</code> 协议，保留原文出处链接和本声明。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/posts/author-collab-llm-writing-collaboration/cover.png" alt="Author-Collab LLM 封面"></p>
+<p>随着大语言模型在内容生成领域的快速发展，写作辅助系统已逐渐从“单轮文本补全”演进为“多轮协同创作”。然而，现有通用模型在作者交互场景中仍普遍存在三个问题：其一，倾向于在信息不充分时直接生成内容，而非主动澄清作者意图；其二，难以在多轮交互中持续维护风格偏好、角色设定与叙事约束；其三，优化目标主要聚焦单轮回复质量，而缺乏对长期协作效果的建模。针对上述问题，本文提出一种面向作者协同创作的小模型训练框架，其核心目标并非单纯提升文本生成能力，而是使模型具备“主动追问、约束整合、阶段切换与修订协作”的能力。</p>
+<p>在方法上，本文参考了 <code>ICML 2025 Outstanding Paper</code> <code>CollabLLM: From Passive Responders to Active Collaborators</code> 所提出的协同学习思想，将写作辅助任务建模为一个多轮人机协作过程，并围绕长期任务收益构建训练目标。进一步地，结合真实写作场景中的协同行为模式研究，我们将作者交互过程拆解为若干可学习的子任务，包括创意澄清、大纲共创、风格对齐、章节修订和设定冲突诊断等。基于此，本文给出一套由监督微调、偏好优化与多轮强化学习组成的分阶段训练路径，并讨论了适用于小模型场景的数据构建、奖励设计与评估策略。</p>
+<p>本文的观点是：对于“作者协同”这一高交互、强约束、长过程的任务，模型的关键能力不应仅被定义为“写得像”，而更应被定义为“协作得好”。这意味着，小模型的最佳角色并不是孤立地承担全部长文本生成，而是在外部记忆与任务状态的支持下，作为一个具备交互策略能力的协作控制器参与创作流程。该视角对于构建可控、可扩展、可开源的写作助手具有现实意义。</p>
+<p>本文的设计是因为下周左右将正式开源我的 <code>paper</code> 和 <code>model</code>，<code>Hugging Face</code> 可以提前关注，宣传三四天 GitHub 目前已经 <code>100+ star</code> 了。非常感谢大家，感兴趣的可以 <code>star</code>。</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/posts/author-collab-llm-writing-collaboration/framework.png" alt="Author-Collab LLM 项目图"></p>
+<h2 id="1-问题背景"><a href="#1-问题背景" class="headerlink" title="1. 问题背景"></a>1. 问题背景</h2><p>在当前的大模型应用生态中，写作辅助通常被简化为一个标准的指令跟随问题：用户给出需求，模型返回文本结果。这种范式在摘要、润色、翻译等相对封闭的任务中具有较好的适配性，但在长篇写作、创意策划和反复修订等开放式任务中却面临明显局限。</p>
+<p>首先，作者需求往往并不是一次性完整表达的。用户初始输入经常只包含一个模糊设想，真正决定作品质量的关键变量，例如叙事视角、人物动机、节奏控制、风格边界和禁用元素，通常需要在多轮交流中逐步澄清。其次，写作任务具有显著的长期依赖特征。模型若无法在交互过程中稳定维护角色设定、世界观规则和既有文风，便容易出现“前后不一致”“风格漂移”与“情节断裂”等问题。最后，从优化目标来看，传统微调大多只关注当前轮次的回答质量，却很少考虑一个回答是否真正推动了后续协作，是否减少了用户返工，是否使整个创作过程更高效。</p>
+<p>因此，作者交互型模型的关键不在于“生成更长的文本”，而在于“更有效地参与创作过程”。这类模型需要具备四项核心能力：</p>
+<ul>
+<li>对模糊需求进行主动澄清</li>
+<li>显式整合作者约束</li>
+<li>在提问、建议与产出之间进行阶段切换</li>
+<li>在已有文本基础上进行结构化修订与协同推进</li>
+</ul>
+<h2 id="2-相关工作与研究启发"><a href="#2-相关工作与研究启发" class="headerlink" title="2. 相关工作与研究启发"></a>2. 相关工作与研究启发</h2><h3 id="2-1-从单轮指令跟随到多轮协作优化"><a href="#2-1-从单轮指令跟随到多轮协作优化" class="headerlink" title="2.1 从单轮指令跟随到多轮协作优化"></a>2.1 从单轮指令跟随到多轮协作优化</h3><p><code>CollabLLM</code> 的核心贡献在于，它不再将人机交互视为一系列彼此独立的单步决策，而是将模型回复看作一个会影响未来交互轨迹的协作行为。论文提出了 <code>Multiturn-aware Reward</code>，即通过对未来多轮对话结果进行估计，评价当前回复是否真正促进了长期任务完成。这一思想对于作者交互场景具有很强的解释力：一次高质量回复并不一定意味着一次高质量协作，真正重要的是它是否减少了歧义、收敛了目标、降低了后续修改成本。</p>
+<h3 id="2-2-真实写作场景中的协同模式"><a href="#2-2-真实写作场景中的协同模式" class="headerlink" title="2.2 真实写作场景中的协同模式"></a>2.2 真实写作场景中的协同模式</h3><p>另一类重要研究来自对真实写作行为的分析。<code>Prototypical Human-AI Collaboration Behaviors from LLM-Assisted Writing in the Wild</code> 指出，用户在 <code>LLM</code> 辅助写作中的后续交互行为并非随机发散，而是会收敛到少数几类可归纳的协作原型，例如澄清、扩展、局部修订、风格调整和反馈纠偏等。这一发现意味着，作者协同并不是不可学习的开放混沌过程，而是可以通过行为分型、数据标注和策略优化逐步建模的。</p>
+<h3 id="2-3-作者需求视角的重要性"><a href="#2-3-作者需求视角的重要性" class="headerlink" title="2.3 作者需求视角的重要性"></a>2.3 作者需求视角的重要性</h3><p><code>Making the Write Connections: Linking Writing Support Tools with Writer&#39;s Needs</code> 强调，写作工具的价值不应只从技术能力衡量，还应从作者需求结构衡量。换言之，模型不是单纯提供文本，而是在不同写作阶段支持作者完成不同认知任务。这一视角提示我们：训练目标需要围绕“作者需要什么样的协助”来设计，而不应只围绕“模型能生成什么”来设计。</p>
+<h2 id="3-作者协同小模型的任务定义"><a href="#3-作者协同小模型的任务定义" class="headerlink" title="3. 作者协同小模型的任务定义"></a>3. 作者协同小模型的任务定义</h2><p>基于上述研究，我们将作者交互型小模型定义为一个面向写作流程的协作型智能体。它的目标不是替代作者完成全部创作，而是在多轮交互中承担“意图压缩器、约束整合器、写作推进器与修订协调器”的角色。</p>
+<p>从任务结构上看，该模型至少应覆盖以下几类子任务：</p>
+<h3 id="3-1-创意澄清"><a href="#3-1-创意澄清" class="headerlink" title="3.1 创意澄清"></a>3.1 创意澄清</h3><p>当用户只提供一个模糊设想时，模型需要优先识别高不确定性槽位，并提出最少但最有效的问题，以快速收敛题材、冲突、角色关系与读者体验目标。</p>
+<h3 id="3-2-大纲共创"><a href="#3-2-大纲共创" class="headerlink" title="3.2 大纲共创"></a>3.2 大纲共创</h3><p>在完成初步澄清后，模型需要将散乱的设想组织为结构化叙事框架，包括主线矛盾、阶段推进、情绪曲线和章节职责分配。</p>
+<h3 id="3-3-风格对齐"><a href="#3-3-风格对齐" class="headerlink" title="3.3 风格对齐"></a>3.3 风格对齐</h3><p>模型应能够识别并保持作者偏好的文风特征，例如克制、冷峻、抒情、轻快、电影感或网络连载感，并在重写或续写时避免风格漂移。</p>
+<h3 id="3-4-局部修订"><a href="#3-4-局部修订" class="headerlink" title="3.4 局部修订"></a>3.4 局部修订</h3><p>当作者提供片段文本时，模型需要判断当前需求究竟是润色、扩写、压缩、换风格、增强张力，还是修复逻辑冲突，并据此采取不同修订策略。</p>
+<h3 id="3-5-设定一致性维护"><a href="#3-5-设定一致性维护" class="headerlink" title="3.5 设定一致性维护"></a>3.5 设定一致性维护</h3><p>对于中长篇创作，模型需要配合外部记忆系统维护角色卡、世界观规则、时间线和关键事实，避免生成过程中的全局失真。</p>
+<h2 id="4-方法框架：从监督学习到多轮协作学习"><a href="#4-方法框架：从监督学习到多轮协作学习" class="headerlink" title="4. 方法框架：从监督学习到多轮协作学习"></a>4. 方法框架：从监督学习到多轮协作学习</h2><p>本文建议将作者协同小模型的训练划分为三个阶段。</p>
+<h3 id="4-1-第一阶段：监督微调"><a href="#4-1-第一阶段：监督微调" class="headerlink" title="4.1 第一阶段：监督微调"></a>4.1 第一阶段：监督微调</h3><p>第一阶段的目标是让模型掌握基础协同行为，即知道何时提问、提问什么、如何归纳当前共识，以及何时应停止追问并进入内容产出。与传统 <code>instruction tuning</code> 不同，这里的训练样本不应以“单轮命令-答案”作为主要形式，而应以“多轮协作片段”作为最小训练单位。</p>
+<p>一个有效的监督样本应当包含：</p>
+<ul>
+<li>用户初始模糊需求</li>
+<li>模型的澄清性回应</li>
+<li>用户补充约束</li>
+<li>模型对当前共识的更新</li>
+<li>进入大纲、建议或正文生成的转折点</li>
+</ul>
+<p>在这一阶段，模型学习的是“协作格式”和“交互策略基础”，而非最终写作能力的上限。</p>
+<h3 id="4-2-第二阶段：偏好优化"><a href="#4-2-第二阶段：偏好优化" class="headerlink" title="4.2 第二阶段：偏好优化"></a>4.2 第二阶段：偏好优化</h3><p>仅靠监督微调，模型往往会学会表面上合理的提问模板，但不一定能学会“什么样的回复更能推进作者任务”。因此，第二阶段可引入偏好学习，如 <code>DPO</code>。</p>
+<p>在作者协同场景中，偏好正样本通常具备以下特征：</p>
+<ul>
+<li>优先解决最关键的不确定项，而非泛泛而谈</li>
+<li>尽量减少无效追问</li>
+<li>显式引用并维护作者已经表达的约束</li>
+<li>在适当时机给出可执行选项，而不是继续空泛讨论</li>
+<li>避免模型越权替代作者进行风格决策</li>
+</ul>
+<p>相反，偏好负样本则往往表现为：</p>
+<ul>
+<li>在信息不足时直接大段生成</li>
+<li>连续提问但缺乏推进</li>
+<li>忽略历史上下文</li>
+<li>输出看似流畅但不贴合作者目标</li>
+</ul>
+<h3 id="4-3-第三阶段：多轮协作强化学习"><a href="#4-3-第三阶段：多轮协作强化学习" class="headerlink" title="4.3 第三阶段：多轮协作强化学习"></a>4.3 第三阶段：多轮协作强化学习</h3><p>若希望模型进一步具备长期协作意识，则需要参考 <code>CollabLLM</code> 的思路，引入多轮交互优化。具体而言，可通过用户模拟器生成作者后续反馈，再利用长期评估器计算一段交互是否提高了最终协作收益，从而将训练目标从“当前回答最优”转变为“整个创作过程更优”。</p>
+<p>在这一阶段，核心并不只是采用 <code>PPO</code>、<code>GRPO</code> 或其他强化学习算法，而是要构建两个关键模块：</p>
+<p>一是<strong>用户模拟器</strong>。该模块应模拟不同作者类型，例如高控制型作者、模糊型作者和迭代修订型作者，并为不同任务设定生成相应的反馈轨迹。</p>
+<p>二是<strong>长期评估器</strong>。它用于判断一轮回复是否在整体上改善了任务完成度，例如是否推进了故事设定收敛，是否减少了返工，是否更贴近作者意图，是否提高了最终文本可用率。</p>
+<h2 id="5-数据构建策略"><a href="#5-数据构建策略" class="headerlink" title="5. 数据构建策略"></a>5. 数据构建策略</h2><p>对于作者协同小模型而言，数据质量远比数据规模更重要。本文建议从四类来源构建训练数据。</p>
+<h3 id="5-1-人工高质量种子数据"><a href="#5-1-人工高质量种子数据" class="headerlink" title="5.1 人工高质量种子数据"></a>5.1 人工高质量种子数据</h3><p>这是整个训练体系中最关键的数据来源。可由具备写作经验或编辑经验的标注者手工撰写多轮协作样本，用于定义模型的目标行为边界。</p>
+<h3 id="5-2-强模型蒸馏生成的数据"><a href="#5-2-强模型蒸馏生成的数据" class="headerlink" title="5.2 强模型蒸馏生成的数据"></a>5.2 强模型蒸馏生成的数据</h3><p>可利用更强的大模型分别扮演“协同助手”和“作者用户”，生成大规模多轮对话数据。该方法适合快速扩展样本规模，但应通过规则过滤和人工抽检避免模板化问题。</p>
+<h3 id="5-3-公开真实对话数据的筛选与重标注"><a href="#5-3-公开真实对话数据的筛选与重标注" class="headerlink" title="5.3 公开真实对话数据的筛选与重标注"></a>5.3 公开真实对话数据的筛选与重标注</h3><p>如 <code>WildChat</code> 一类的真实用户对话日志，可以筛选出与写作、创意、润色、改写相关的会话，再基于行为标签体系进行二次整理，以增强模型对真实表达习惯的适配。</p>
+<h3 id="5-4-行为-taxonomy-驱动的数据重写"><a href="#5-4-行为-taxonomy-驱动的数据重写" class="headerlink" title="5.4 行为 taxonomy 驱动的数据重写"></a>5.4 行为 taxonomy 驱动的数据重写</h3><p>结合真实协同行为研究，可为训练数据附加诸如“澄清”“扩展”“局部修订”“风格调整”“纠偏反馈”等标签，使模型学习的不只是语言形式，而是交互行为类别。</p>
+<h2 id="6-奖励设计与评估体系"><a href="#6-奖励设计与评估体系" class="headerlink" title="6. 奖励设计与评估体系"></a>6. 奖励设计与评估体系</h2><p>作者协同模型的评估不应局限于文本质量评分，而应围绕“是否协作得更好”展开。为此，可设计如下长期奖励函数：</p>
+<p><code>R = α1G + α2C + α3E + α4A + α5U + α6S</code></p>
+<p>其中：</p>
+<ul>
+<li><code>G</code> 表示任务推进度</li>
+<li><code>C</code> 表示约束覆盖率</li>
+<li><code>E</code> 表示澄清效率</li>
+<li><code>A</code> 表示作者意图对齐度</li>
+<li><code>U</code> 表示输出可用性</li>
+<li><code>S</code> 表示安全性与规范性</li>
+</ul>
+<p>对应到实践中，可进一步落为以下指标：</p>
+<ul>
+<li>平均任务收敛轮数</li>
+<li>作者重复说明次数</li>
+<li>历史约束命中率</li>
+<li>风格保持评分</li>
+<li>章节修订可接受率</li>
+<li>最终文本二次修改比例</li>
+<li>用户主观满意度</li>
+</ul>
+<p>需要强调的是，<code>BLEU</code>、<code>ROUGE</code> 等传统自动指标在此类任务中的解释力非常有限。因为一个回复即使与参考答案不接近，也可能是一次更优的协作决策。</p>
+<h2 id="7-小模型的合理角色定位"><a href="#7-小模型的合理角色定位" class="headerlink" title="7. 小模型的合理角色定位"></a>7. 小模型的合理角色定位</h2><p>从工程与研究的双重角度看，小模型在作者协同场景中最合理的定位并不是“单独承担全部长文本生成”，而是“成为一个具有协作策略能力的控制器”。</p>
+<p>更具体地说，小模型更适合承担以下职责：</p>
+<ul>
+<li>在多轮对话中识别缺失信息</li>
+<li>维护结构化作者状态</li>
+<li>决定当前应继续提问、给选项还是开始产出</li>
+<li>调用外部记忆或更强写作器完成后续生成</li>
+</ul>
+<p>这一架构具有三个优势。首先，它显著降低了对小模型参数容量的要求；其次，它使模型行为更可控、更可解释；最后，它更适合开源发布与社区扩展，因为研究者可以分别替换策略模型、记忆模块和生成模块。</p>
+<p>因此，从可行性与性价比来看，面向作者协同的小模型是一条比“做一个缩小版通用写作大模型”更现实、更具有研究价值的路线。</p>
+<h2 id="8-开源实现与未来工作"><a href="#8-开源实现与未来工作" class="headerlink" title="8. 开源实现与未来工作"></a>8. 开源实现与未来工作</h2><p>基于上述框架，我们计划构建一个面向作者协同写作的开源小模型项目，其主要目标包括：</p>
+<ul>
+<li>支持创意澄清、大纲共创与章节修订等核心任务</li>
+<li>提供多轮协作式训练数据格式</li>
+<li>提供基于 <code>SFT</code>、<code>DPO</code> 和多轮优化的训练脚本</li>
+<li>集成结构化记忆与作者偏好管理</li>
+<li>在 <code>Hugging Face</code> 上开放模型、数据与评测基准</li>
+</ul>
+<p>未来工作将进一步聚焦以下方向：</p>
+<ul>
+<li>引入更细粒度的作者 <code>persona</code> 建模</li>
+<li>优化长期奖励估计的稳定性</li>
+<li>将协同行为评估从 <code>LLM-as-a-Judge</code> 扩展到真实用户实验</li>
+<li>探索小模型与强生成模型的协同推理架构</li>
+</ul>
+<h2 id="9-结语"><a href="#9-结语" class="headerlink" title="9. 结语"></a>9. 结语</h2><p>作者交互型写作助手的核心挑战，从来不只是让模型“写得更像人”，而是让模型“更像一个真正参与创作过程的协作者”。这一目标要求我们重新理解写作辅助的训练对象：它不是单轮生成器，而是一个在长期任务中不断澄清、协调、收束与推进的协作系统。</p>
+<p><code>CollabLLM</code> 所代表的多轮协作学习为这一问题提供了清晰的方法论起点，而真实写作场景中的行为研究又进一步表明，作者与模型之间的协同模式具有可学习、可归纳、可优化的结构。因此，围绕作者协同构建小模型，不仅在工程上是可行的，在研究上同样具备明确价值。</p>
+<p>如果未来写作模型的发展方向不再是“谁一次性写得最长”，而是谁能在创作过程中更稳定地理解作者、支持作者并与作者共同推进作品，那么面向协作的小模型将成为非常重要的一类基础能力。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li><code>CollabLLM: From Passive Responders to Active Collaborators</code><br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2502.00640">https://arxiv.org/abs/2502.00640</a></li>
+<li><code>CollabLLM</code> 官方代码<br><a target="_blank" rel="noopener" href="https://github.com/microsoft/CollabLLM">https://github.com/microsoft/CollabLLM</a></li>
+<li><code>CollabLLM</code> 项目介绍<br><a target="_blank" rel="noopener" href="https://aka.ms/CollabLLM">https://aka.ms/CollabLLM</a></li>
+<li><code>VERL</code> 文档中的 <code>CollabLLM Recipe</code><br><a target="_blank" rel="noopener" href="https://verl.readthedocs.io/en/latest/algo/collabllm.html">https://verl.readthedocs.io/en/latest/algo/collabllm.html</a></li>
+<li><code>Prototypical Human-AI Collaboration Behaviors from LLM-Assisted Writing in the Wild</code><br><a target="_blank" rel="noopener" href="https://aclanthology.org/2025.emnlp-main.852.pdf">https://aclanthology.org/2025.emnlp-main.852.pdf</a></li>
+<li><code>Prototypical Human-AI Collaboration</code> 项目页<br><a target="_blank" rel="noopener" href="https://prototypical-hai-collaborations.github.io/">https://prototypical-hai-collaborations.github.io/</a></li>
+<li><code>WildChat</code> 数据集<br><a target="_blank" rel="noopener" href="https://huggingface.co/datasets/allenai/WildChat">https://huggingface.co/datasets/allenai/WildChat</a></li>
+<li><code>Making the Write Connections: Linking Writing Support Tools with Writer’s Needs</code><br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2502.13320">https://arxiv.org/abs/2502.13320</a></li>
+<li><code>Hugging Face TRL</code><br><a target="_blank" rel="noopener" href="https://huggingface.co/docs/trl/en/index">https://huggingface.co/docs/trl/en/index</a></li>
+<li><code>Alignment Handbook</code><br><a target="_blank" rel="noopener" href="https://github.com/huggingface/alignment-handbook">https://github.com/huggingface/alignment-handbook</a></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://xiao-zi-chen.github.io">X1a0Ch3n</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://xiao-zi-chen.github.io/2026/03/21/author-collab-llm-writing-collaboration/">https://xiao-zi-chen.github.io/2026/03/21/author-collab-llm-writing-collaboration/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://xiao-zi-chen.github.io" target="_blank">re的编程之旅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Author-Collab-LLM/">Author-Collab LLM</a><a class="post-meta__tags" href="/tags/AI-%E5%86%99%E4%BD%9C/">AI 写作</a><a class="post-meta__tags" href="/tags/%E4%BA%BA%E6%9C%BA%E5%8D%8F%E5%90%8C/">人机协同</a><a class="post-meta__tags" href="/tags/Python/">Python</a><a class="post-meta__tags" href="/tags/Multi-Agent/">Multi-Agent</a></div><div class="post-share"><div class="social-share" data-image="/img/Le-Prince-Grenouille.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/03/20/dynamic-memory-first-long-form-ai-writing/" title="从静态检索到动态记忆：面向长篇 AI 写作的一种 Memory-First 架构思路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">从静态检索到动态记忆：面向长篇 AI 写作的一种 Memory-First 架构思路</div></div><div class="info-2"><div class="info-item-1">这篇文章继续围绕 CoLong Idea Studio 的核心机制展开，重点讨论长篇 AI 写作里为什么不能只依赖静态检索，而需要一套真正面向叙事连续性的动态记忆系统。 相比“检索更多资料”，长篇创作系统更需要“在正确的时刻唤回正确的内部记忆”。这也是 Memory-First 这套思路最核心的价值。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159289864GitHub：https://github.com/HITSZ-DS/CoLong-Idea-Studio.git线上平台：https://colong-idea-studio.cloud转载说明：本文转载自 CSDN 博主 xyc_yyds 的原创文章，遵循 CC 4.0 BY-SA 协议，保留原文出处链接和本声明。  之前的 CoLong Idea Studio 开源项目详解这篇文章的反响似乎不错，GitHub 这几天也快涨到 100 star 了，还算不错的结果。现在就来讨论一下我们项目用到的核心观点之一动态 memory...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/03/20/dynamic-memory-first-long-form-ai-writing/" title="从静态检索到动态记忆：面向长篇 AI 写作的一种 Memory-First 架构思路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-20</div><div class="info-item-2">从静态检索到动态记忆：面向长篇 AI 写作的一种 Memory-First 架构思路</div></div><div class="info-2"><div class="info-item-1">这篇文章继续围绕 CoLong Idea Studio 的核心机制展开，重点讨论长篇 AI 写作里为什么不能只依赖静态检索，而需要一套真正面向叙事连续性的动态记忆系统。 相比“检索更多资料”，长篇创作系统更需要“在正确的时刻唤回正确的内部记忆”。这也是 Memory-First 这套思路最核心的价值。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159289864GitHub：https://github.com/HITSZ-DS/CoLong-Idea-Studio.git线上平台：https://colong-idea-studio.cloud转载说明：本文转载自 CSDN 博主 xyc_yyds 的原创文章，遵循 CC 4.0 BY-SA 协议，保留原文出处链接和本声明。  之前的 CoLong Idea Studio 开源项目详解这篇文章的反响似乎不错，GitHub 这几天也快涨到 100 star 了，还算不错的结果。现在就来讨论一下我们项目用到的核心观点之一动态 memory...</div></div></div></a><a class="pagination-related" href="/2026/03/17/colong-idea-studio-open-source-project/" title="CoLong Idea Studio开源项目详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-17</div><div class="info-item-2">CoLong Idea Studio开源项目详解</div></div><div class="info-2"><div class="info-item-1">这篇文章围绕 CoLong Idea Studio 展开，介绍我在长篇 AI 创作方向上的整体探索，以及动态记忆优先、协同创意完善和章节生成闭环这些核心设计。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159169356 GitHub：https://github.com/HITSZ-DS/CoLong-Idea-Studio.git线上平台：https://colong-idea-studio.cloud  一、为什么要做这个项目如果只把 AI 写作理解成“输入一句 prompt，输出一段文本”，那它最多只是即时生成器，很难真正支持长篇创作、持续创作、多人协作和高一致性创作。 我做 CoLong Idea Studio 和 Write-Claw，本质上都在回答同一个问题： AI 怎样从一次性文本生成工具，演进为一个能够持续思考、持续记忆、持续规划、持续观察、持续协作的长篇创作系统。 这两个项目的侧重点并不相同：  CoLong Idea Studio...</div></div></div></a><a class="pagination-related" href="/2026/03/19/python-network-threat-protection-analysis-system/" title="基于 Python 的网络威胁防御分析系统设计与实现"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-19</div><div class="info-item-2">基于 Python 的网络威胁防御分析系统设计与实现</div></div><div class="info-2"><div class="info-item-1">这篇文章介绍一个基于 Python 的网络威胁防御分析系统，从流量采集、威胁检测到事件关联和防御建议输出，尽量把“检测闭环”真正做完整。   原文链接：https://blog.csdn.net/xyc_yyds/article/details/159247592 GitHub：https://github.com/xiao-zi-chen/network-threat-defense-suite.git  期末作业也开源出来了，后面如果还有类似需求可以直接参考，现在也做成了 Claude 插件方向的形态。 一、项目简介Network Threat Defense Suite 是一个基于 Python 实现的网络威胁防御分析项目，面向网络流量安全检测与防御研判场景。 项目支持对 PCAP 离线流量包 和 实时抓包流量 进行分析，能够自动识别：  端口扫描 暴力破解 DNS 异常 ARP...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/loading.gif" data-original="/img/Le-Prince-Grenouille.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">X1a0Ch3n</div><div class="author-info-description">RRRRRE</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">19</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xiao-zi-chen"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/xiao-zi-chen" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:915119162@qq.com" target="_blank" title="QQ Mail"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="mailto:yuchengxiao264@gmail.com" target="_blank" title="Gmail"><i class="far fa-envelope" style="color: #d14836;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">1. 问题背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C%E4%B8%8E%E7%A0%94%E7%A9%B6%E5%90%AF%E5%8F%91"><span class="toc-number">2.</span> <span class="toc-text">2. 相关工作与研究启发</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E4%BB%8E%E5%8D%95%E8%BD%AE%E6%8C%87%E4%BB%A4%E8%B7%9F%E9%9A%8F%E5%88%B0%E5%A4%9A%E8%BD%AE%E5%8D%8F%E4%BD%9C%E4%BC%98%E5%8C%96"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 从单轮指令跟随到多轮协作优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E7%9C%9F%E5%AE%9E%E5%86%99%E4%BD%9C%E5%9C%BA%E6%99%AF%E4%B8%AD%E7%9A%84%E5%8D%8F%E5%90%8C%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 真实写作场景中的协同模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E4%BD%9C%E8%80%85%E9%9C%80%E6%B1%82%E8%A7%86%E8%A7%92%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 作者需求视角的重要性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BD%9C%E8%80%85%E5%8D%8F%E5%90%8C%E5%B0%8F%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%AE%9A%E4%B9%89"><span class="toc-number">3.</span> <span class="toc-text">3. 作者协同小模型的任务定义</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%88%9B%E6%84%8F%E6%BE%84%E6%B8%85"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 创意澄清</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%A4%A7%E7%BA%B2%E5%85%B1%E5%88%9B"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 大纲共创</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E9%A3%8E%E6%A0%BC%E5%AF%B9%E9%BD%90"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 风格对齐</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E5%B1%80%E9%83%A8%E4%BF%AE%E8%AE%A2"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 局部修订</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-%E8%AE%BE%E5%AE%9A%E4%B8%80%E8%87%B4%E6%80%A7%E7%BB%B4%E6%8A%A4"><span class="toc-number">3.5.</span> <span class="toc-text">3.5 设定一致性维护</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%96%B9%E6%B3%95%E6%A1%86%E6%9E%B6%EF%BC%9A%E4%BB%8E%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0%E5%88%B0%E5%A4%9A%E8%BD%AE%E5%8D%8F%E4%BD%9C%E5%AD%A6%E4%B9%A0"><span class="toc-number">4.</span> <span class="toc-text">4. 方法框架：从监督学习到多轮协作学习</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%EF%BC%9A%E7%9B%91%E7%9D%A3%E5%BE%AE%E8%B0%83"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 第一阶段：监督微调</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%81%8F%E5%A5%BD%E4%BC%98%E5%8C%96"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 第二阶段：偏好优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%A4%9A%E8%BD%AE%E5%8D%8F%E4%BD%9C%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0"><span class="toc-number">4.3.</span> <span class="toc-text">4.3 第三阶段：多轮协作强化学习</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%95%B0%E6%8D%AE%E6%9E%84%E5%BB%BA%E7%AD%96%E7%95%A5"><span class="toc-number">5.</span> <span class="toc-text">5. 数据构建策略</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E4%BA%BA%E5%B7%A5%E9%AB%98%E8%B4%A8%E9%87%8F%E7%A7%8D%E5%AD%90%E6%95%B0%E6%8D%AE"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 人工高质量种子数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%BC%BA%E6%A8%A1%E5%9E%8B%E8%92%B8%E9%A6%8F%E7%94%9F%E6%88%90%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 强模型蒸馏生成的数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%85%AC%E5%BC%80%E7%9C%9F%E5%AE%9E%E5%AF%B9%E8%AF%9D%E6%95%B0%E6%8D%AE%E7%9A%84%E7%AD%9B%E9%80%89%E4%B8%8E%E9%87%8D%E6%A0%87%E6%B3%A8"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 公开真实对话数据的筛选与重标注</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E8%A1%8C%E4%B8%BA-taxonomy-%E9%A9%B1%E5%8A%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E9%87%8D%E5%86%99"><span class="toc-number">5.4.</span> <span class="toc-text">5.4 行为 taxonomy 驱动的数据重写</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%A5%96%E5%8A%B1%E8%AE%BE%E8%AE%A1%E4%B8%8E%E8%AF%84%E4%BC%B0%E4%BD%93%E7%B3%BB"><span class="toc-number">6.</span> <span class="toc-text">6. 奖励设计与评估体系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E5%B0%8F%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%90%88%E7%90%86%E8%A7%92%E8%89%B2%E5%AE%9A%E4%BD%8D"><span class="toc-number">7.</span> <span class="toc-text">7. 小模型的合理角色定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E5%BC%80%E6%BA%90%E5%AE%9E%E7%8E%B0%E4%B8%8E%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="toc-number">8.</span> <span class="toc-text">8. 开源实现与未来工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E7%BB%93%E8%AF%AD"><span class="toc-number">9.</span> <span class="toc-text">9. 结语</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">10.</span> <span class="toc-text">参考资料</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/21/author-collab-llm-writing-collaboration/" title="Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案">Author-Collab LLM：一种面向写作场景的人机协同小模型训练方案</a><time datetime="2026-03-21T14:29:27.000Z" title="发表于 2026-03-21 22:29:27">2026-03-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/20/dynamic-memory-first-long-form-ai-writing/" title="从静态检索到动态记忆：面向长篇 AI 写作的一种 Memory-First 架构思路">从静态检索到动态记忆：面向长篇 AI 写作的一种 Memory-First 架构思路</a><time datetime="2026-03-20T13:50:55.000Z" title="发表于 2026-03-20 21:50:55">2026-03-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/19/python-network-threat-protection-analysis-system/" title="基于 Python 的网络威胁防御分析系统设计与实现">基于 Python 的网络威胁防御分析系统设计与实现</a><time datetime="2026-03-19T08:15:05.000Z" title="发表于 2026-03-19 16:15:05">2026-03-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/18/open-claw-mcp-security-project/" title="面对open claw的安全问题：我开源一个 MCP 安全检测项目">面对open claw的安全问题：我开源一个 MCP 安全检测项目</a><time datetime="2026-03-18T15:31:36.000Z" title="发表于 2026-03-18 23:31:36">2026-03-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/03/17/write-claw-long-form-ai-writing-workspace/" title="Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace">Write-Claw：一个面向长篇 AI 写作的 Claw-Native Runtime Workspace</a><time datetime="2026-03-17T13:39:55.000Z" title="发表于 2026-03-17 21:39:55">2026-03-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2025/3/25 - 2026 By X1a0Ch3n</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div><div class="footer_custom_text">RE</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload/dist/lazyload.iife.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="algolia-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="search-wrap"><div id="algolia-search-input"></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-info"><div class="algolia-stats"></div><div class="algolia-poweredBy"></div></div></div></div></div><div id="search-mask"></div><script src="https://cdn.jsdelivr.net/npm/algoliasearch/dist/lite/builds/browser.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instantsearch.js/dist/instantsearch.production.min.js"></script><script src="/js/search/algolia.js"></script></div></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
